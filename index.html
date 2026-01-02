@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Luxury Birthday Secret</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+
+body{
+  height:100vh;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,200,150,.18), transparent 45%),
+    radial-gradient(circle at 70% 40%, rgba(120,180,255,.18), transparent 50%),
+    linear-gradient(180deg,#020617,#050b1a);
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:white;
+}
+
+/* ===== LOCK ===== */
+.lock{
+  position:fixed;inset:0;
+  display:flex;justify-content:center;align-items:center;
+  backdrop-filter:blur(18px);
+  background:rgba(0,0,0,.45);
+  z-index:10;
+}
+.lock-box{
+  padding:42px 40px;
+  border-radius:30px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  text-align:center;
+}
+.lock-box h2{font-weight:400;margin-bottom:8px}
+.lock-box p{opacity:.75;margin-bottom:20px}
+.lock-box input{
+  padding:14px 22px;border-radius:40px;border:none;
+  text-align:center;font-size:16px;outline:none;
+}
+.lock-box button{
+  margin-top:22px;padding:14px 44px;
+  border:none;border-radius:40px;cursor:pointer;
+  background:linear-gradient(135deg,#ffd27d,#ffb347);
+  box-shadow:0 0 30px rgba(255,210,125,.9);
+}
+
+/* ===== MAIN ===== */
+.main{opacity:0;transition:opacity 1.5s ease}
+
+/* ===== LED VIỀN (AURA) ===== */
+.led-wrap{position:relative;padding:3px;border-radius:36px}
+.led-wrap::before{
+  content:"";position:absolute;inset:-6px;border-radius:40px;
+  background:
+    radial-gradient(circle at top left,rgba(255,210,140,.9),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(140,200,255,.9),transparent 55%);
+  filter:blur(18px);z-index:-1;
+}
+.led-wrap::after{
+  content:"";position:absolute;inset:0;border-radius:36px;
+  border:1.5px solid rgba(255,220,160,.55);
+  box-shadow:
+    0 0 18px rgba(255,210,140,.6),
+    0 0 28px rgba(140,200,255,.4);
+  z-index:-1;
+}
+
+/* ===== CARD ===== */
+.card{
+  padding:52px 44px;border-radius:32px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);
+  max-width:520px;text-align:center;
+}
+
+/* ===== TEXT ===== */
+.text{
+  font-size:22px;line-height:1.8;min-height:180px;
+  white-space:pre-line;
+  text-shadow:
+    0 0 12px rgba(255,255,255,.7),
+    0 0 26px rgba(255,200,120,.6);
+}
+
+/* ===== BUTTON ===== */
+.btn{
+  margin-top:32px;padding:15px 44px;
+  border:none;border-radius:50px;cursor:pointer;
+  background:linear-gradient(135deg,#ffd27d,#ffb347);
+  box-shadow:0 0 35px rgba(255,210,125,.9);
+}
+
+/* ===== SNOW ===== */
+.snow{
+  position:fixed;top:-10px;color:white;opacity:.4;
+  animation:snow linear infinite;
+}
+@keyframes snow{to{transform:translateY(110vh);opacity:0}}
+
+/* ===== FIREWORK ===== */
+.firework{
+  position:fixed;width:6px;height:6px;border-radius:50%;
+  background:gold;animation:explode 1.2s ease-out forwards;
+}
+@keyframes explode{
+  to{transform:translate(var(--x),var(--y)) scale(0);opacity:0}
+}
+
+/* ===== MOBILE FULLSCREEN ===== */
+@media (max-width: 768px){
+  body{padding:20px}
+  .led-wrap{width:100%}
+  .card{
+    width:100%;max-width:none;min-height:70vh;
+    padding:36px 26px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .text{font-size:20px;min-height:200px}
+  .btn{width:100%;font-size:17px;padding:16px 0}
+  .lock-box{width:90%;padding:36px 26px}
+  .lock-box input,.lock-box button{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOCK -->
+<div class="lock" id="lock">
+  <div class="lock-box">
+    <h2>💎 Một điều bí mật</h2>
+    <p>Chỉ dành cho người đặc biệt</p>
+    <input type="password" id="pass" placeholder="Nhập mật khẩu">
+    <br>
+    <button onclick="unlock()">Mở quà ✨</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main">
+  <div class="led-wrap">
+    <div class="card">
+      <div class="text" id="text"></div>
+      <button class="btn" onclick="next()">Chạm vào ✨</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PASSWORD="LOVE2026";
+const messages=[
+  "🌙 Đêm nay thật yên tĩnh…",
+  "Có một điều nhỏ bé\nnhưng rất chân thành",
+  "🎂 Chúc mừng sinh nhật",
+  "Cảm ơn vì đã ở đây\nvà làm cuộc sống này ấm áp hơn",
+  "🌟 Tuổi mới an yên\nvà đủ đầy yêu thương"
+];
+let index=0,typing=false;
+
+function unlock(){
+  if(pass.value===PASSWORD){
+    lock.style.display="none";
+    main.style.opacity=1;
+    typeText(messages[0]);
+  }else alert("Sai mật khẩu");
+}
+
+function typeText(t){
+  text.innerHTML="";typing=true;let i=0;
+  const timer=setInterval(()=>{
+    text.innerHTML+=t[i]==="\n"?"<br>":t[i];
+    i++;
+    if(i>=t.length){clearInterval(timer);typing=false}
+  },45);
+}
+
+function next(){
+  if(typing) return;
+  index++;
+  if(index<messages.length){
+    typeText(messages[index]);
+  }else{
+    text.innerHTML="🎉 CHÚC MỪNG SINH NHẬT 🎉";
+    launchFireworks();
+  }
+}
+
+/* FIREWORK */
+function launchFireworks(){
+  for(let i=0;i<80;i++){
+    const f=document.createElement("div");
+    f.className="firework";
+    f.style.left="50%";f.style.top="50%";
+    f.style.setProperty("--x",(Math.random()*600-300)+"px");
+    f.style.setProperty("--y",(Math.random()*600-300)+"px");
+    document.body.appendChild(f);
+    setTimeout(()=>f.remove(),1200);
+  }
+}
+
+/* SNOW */
+setInterval(()=>{
+  const s=document.createElement("div");
+  s.className="snow";s.innerHTML="❄";
+  s.style.left=Math.random()*100+"vw";
+  s.style.fontSize=Math.random()*10+8+"px";
+  s.style.animationDuration=Math.random()*6+10+"s";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),16000);
+},260);
+</script>
+
+</body>
+</html>
